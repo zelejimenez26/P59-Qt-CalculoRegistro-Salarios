@@ -34,10 +34,10 @@ void Salarios::guardar()
 {
     //Abrir cuadro de dialogo para seleccionar ubicacion y nombre del archivo
     QString nombreArchivo=QFileDialog::getSaveFileName(this,
-                                                       "Guardar datos",
+                                                       "Guardar archivo",
                                                        QDir::home().absolutePath(),
                                                        "Archivos de texto(*.txt)");
-    qDebug()<<nombreArchivo;
+
 
     //Crear un objeto QFile
     QFile archivo(nombreArchivo);
@@ -50,11 +50,40 @@ void Salarios::guardar()
         //Mostrar por 5 segundos que todo esta bien
         ui->statusbar->showMessage("Datos alamcenados en " + nombreArchivo, 5000);
     }else{
-        QMessageBox::warning(this,"Guardar datos", "No se puedo guardar los datos");
+        QMessageBox::warning(this,"Guardar datos", "No se puedo guardar el archivo");
     }
     //Cerrar archivo
     archivo.close();
 
+}
+
+void Salarios::abrir()
+{
+    //Abrir cuadro de dialogo para seleccionar ubicacion y nombre del archivo
+    QString nombreArchivo=QFileDialog::getOpenFileName(this,
+                                                       "Abrir archivo",
+                                                       QDir::home().absolutePath(),
+                                                       "Archivos de texto(*.txt)");
+
+
+    //Crear un objeto QFile
+    QFile archivo(nombreArchivo);
+    //Abrirlo para lectura
+    if(archivo.open(QFile::ReadOnly)){
+        //Crear un stream de texto
+        QTextStream entrada(&archivo);
+        //Leer todo el cintenido del archivo
+        QString datos=entrada.readAll();
+        //Cargar el contenido al area de texto
+        ui->outResultado->clear();
+        ui->outResultado->setPlainText(datos);
+        //Mostrar por 5 segundos que todo esta bien
+        ui->statusbar->showMessage("Datos leidos desde " + nombreArchivo, 5000);
+    }else{
+        QMessageBox::warning(this,"Abrir datos", "No se puedo abrir el archivo");
+    }
+    //Cerrar archivo
+    archivo.close();
 }
 
 
@@ -121,5 +150,11 @@ void Salarios::on_actionNuevo_triggered()
 {
     limpiar();
     ui->outResultado->clear();
+}
+
+
+void Salarios::on_actionAbrir_triggered()
+{
+    abrir();
 }
 
