@@ -42,11 +42,16 @@ void Salarios::guardar()
     //Crear un objeto QFile
     QFile archivo(nombreArchivo);
     //Abrirlo para escritura
-    if(archivo.open(QFile::WriteOnly|QFile::Truncate)){
+    if(archivo.open(QFile::WriteOnly|QIODevice::Text)){
         //Crear un stream de texto
         QTextStream salida(&archivo);
         //Enviar los datos del resulatdo a la salida
         salida<<ui->outResultado->toPlainText();
+        salida<<"****************\n";
+        //salida<<"Totales\n";
+        salida<<ui->outSalarioB->text()<<"\n";
+        salida<<ui->outDescuento->text()<<"\n";
+        salida<<ui->outSalarioN->text()<<"\n";
         //Mostrar por 5 segundos que todo esta bien
         ui->statusbar->showMessage("Datos alamcenados en " + nombreArchivo, 5000);
     }else{
@@ -72,16 +77,41 @@ void Salarios::abrir()
     if(archivo.open(QFile::ReadOnly)){
         //Crear un stream de texto
         QTextStream entrada(&archivo);
-        //Leer todo el cintenido del archivo
+
+        /*
+        //Leer
         QString datos=entrada.readAll();
         //Cargar el contenido al area de texto
         ui->outResultado->clear();
         ui->outResultado->setPlainText(datos);
+        */
+
+        //Leer linea por linea el contenido del archivo
+        QString linea="", totalB="", totalD="", totalN="";
+
+        while (!entrada.atEnd()){
+            linea=linea+entrada.readLine()+"\n";
+            if(linea.contains("********")){
+                linea.remove("*");
+                //return true;
+                totalB=entrada.readLine();
+                totalD=entrada.readLine();
+                totalN=entrada.readLine();
+            }
+        }
+
+        ui->outResultado->clear();
+        ui->outResultado->setPlainText(linea);
+        ui->outSalarioB->setText(totalB);
+        ui->outDescuento->setText(totalD);
+        ui->outSalarioN->setText(totalN);
+
         //Mostrar por 5 segundos que todo esta bien
         ui->statusbar->showMessage("Datos leidos desde " + nombreArchivo, 5000);
     }else{
         QMessageBox::warning(this,"Abrir datos", "No se puedo abrir el archivo");
     }
+
     //Cerrar archivo
     archivo.close();
 }
@@ -125,6 +155,10 @@ void Salarios::calcular()
     if(m_controlador->calcularSalario()){
         //Muestra los resultados de los calculos de los obrero
         ui->outResultado->appendPlainText(m_controlador->obrero()->toString());
+        //Mostrar totales
+        ui->outSalarioB->setText("$ " + QString::number(m_controlador->m_totalSalarioB, 'f', 2));
+        ui->outDescuento->setText("$ " + QString::number(m_controlador->m_totalDescuento, 'f', 2));
+        ui->outSalarioN->setText("$ " + QString::number(m_controlador->m_totalSalarioN, 'f', 2));
         //Limpiar la interfaz
         limpiar();
         //Mostrar mensage por 5 segundos en la barra de estado
@@ -149,7 +183,12 @@ void Salarios::on_actionGuardar_triggered()
 void Salarios::on_actionNuevo_triggered()
 {
     limpiar();
+
     ui->outResultado->clear();
+
+    ui->outSalarioB->clear();
+    ui->outDescuento->clear();
+    ui->outSalarioN->clear();
 }
 
 

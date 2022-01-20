@@ -22,6 +22,10 @@ public:
 
     Obrero *obrero() const;
 
+    double m_totalSalarioB;
+    double m_totalDescuento;
+    double m_totalSalarioN;
+
 signals:
 
 private:

@@ -37,6 +37,7 @@ public:
 
     QString toString();
 
+
 signals:
 
 private:

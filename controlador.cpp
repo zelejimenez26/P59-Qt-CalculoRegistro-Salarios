@@ -3,6 +3,9 @@
 Controlador::Controlador(QObject *parent) : QObject(parent)
 {
     this->m_obrero=nullptr;
+    this->m_totalSalarioB=0;
+    this->m_totalDescuento=0;
+    this->m_totalSalarioN=0;
 }
 
 bool Controlador::agregarObrero(QString nombre, int horas, tipoJornada jornada)
@@ -53,6 +56,11 @@ bool Controlador::calcularSalario()
     m_obrero->setSalarioBruto(salarioBruto);
     m_obrero->setDescuento(descuento);
     m_obrero->setSalarioNeto(salarioNeto);
+
+    //totales
+    m_totalSalarioB+=salarioBruto;
+    m_totalDescuento+=descuento;
+    m_totalSalarioN+=salarioNeto;
 
     return true;
 
